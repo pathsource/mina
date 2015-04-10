@@ -203,4 +203,17 @@ namespace :rails do
     end
   end
 
+  set_default :application_yml, -> { "#{deploy_to}/#{shared_path}/config/application.yml" }
+
+  desc "Read Application.yml config"
+  task config: [:environment] do
+    queue! "cat #{application_yml}"
+  end
+
+  desc "Set Application.yml config"
+  task :config_set, [:expression] => [:environment] do |t, args|
+    key, value = args[:expression].split("=")
+    queue! %{echo "  #{key.upcase}: '#{value}'" | cat >> #{application_yml}}
+  end
+
 end
